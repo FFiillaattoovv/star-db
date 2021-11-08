@@ -16,10 +16,10 @@ export class SwapiService {
         return res.results
     }
 
-    async getPerson(id: string): Promise<PersonType> {
-        let res: GetPersonResponseType;
-        res = await this.getResource(`/people/${id}/`);
-        return res
+    async getPerson(id: string): Promise<TransformPersonType> {
+        let pearson: GetPersonResponseType;
+        pearson = await this.getResource(`/people/${id}/`);
+        return this._transformPerson(pearson)
     }
 
     async getAllPlanets(): Promise<Array<PlanetType>> {
@@ -27,10 +27,10 @@ export class SwapiService {
         return res.results
     }
 
-    async getPlanet(id: string): Promise<PlanetType> {
-        let res: GetPlanetResponseType;
-        res = await this.getResource(`/planets/${id}/`);
-        return res
+    async getPlanet(id: string): Promise<TransformPlanetType> {
+        let planet: GetPlanetResponseType;
+        planet = await this.getResource(`/planets/${id}/`);
+        return this._transformPlanet(planet)
     }
 
     async getAllStarships(): Promise<Array<StarshipType>> {
@@ -38,11 +38,51 @@ export class SwapiService {
         return res.results
     }
 
-    async getStarship(id: string): Promise<StarshipType> {
-        let res: GetStarshipResponseType;
-        res = await this.getResource(`/starships/${id}/`);
-        return res
+    async getStarship(id: string): Promise<TransformStarshipType> {
+        let starship: GetStarshipResponseType;
+        starship = await this.getResource(`/starships/${id}/`);
+        return this._transformStarship(starship)
     }
+
+    _extractId(item: string) {
+        const idRegExp = /\/([0-9]*)\/$/
+        return item.match(idRegExp)![1]
+    }
+
+    _transformPerson(pearson: PersonType): TransformPersonType {
+        return {
+            id: this._extractId(pearson.url),
+            name: pearson.name,
+            gender: pearson.gender,
+            birthYear: pearson.birth_year,
+            eyeColor: pearson.eye_color
+        }
+    }
+
+    _transformPlanet(planet: PlanetType): TransformPlanetType {
+        return {
+            id: this._extractId(planet.url),
+            name: planet.name,
+            population: planet.population,
+            rotationPeriod: planet.rotation_period,
+            diameter: planet.diameter
+        }
+    }
+
+    _transformStarship(starship: StarshipType): TransformStarshipType {
+        return {
+            id: this._extractId(starship.url),
+            name: starship.name,
+            model: starship.model,
+            manufacturer: starship.manufacturer,
+            costInCredits: starship.cost_in_credits,
+            length: starship.length,
+            crew: starship.crew,
+            passengers: starship.passengers,
+            cargoCapacity: starship.cargo_capacity
+        }
+    }
+
 }
 
 //types
@@ -71,6 +111,13 @@ type GetAllPeopleResponseType = {
     results: Array<PersonType>
 }
 type GetPersonResponseType = PersonType
+type TransformPersonType = {
+    id: string
+    name: string
+    gender: string
+    birthYear: string
+    eyeColor: string
+}
 
 type PlanetType = {
     name: string
@@ -95,6 +142,13 @@ type GetAllPlanetsResponseType = {
     results: Array<PlanetType>
 }
 type GetPlanetResponseType = PlanetType
+export type TransformPlanetType = {
+    id: string
+    name: string
+    population: string
+    rotationPeriod: string
+    diameter: string
+}
 
 type StarshipType = {
     name: string
@@ -123,6 +177,17 @@ type GetAllStarshipsResponseType = {
     results: Array<StarshipType>
 }
 type GetStarshipResponseType = StarshipType
+type TransformStarshipType = {
+    id: string
+    name: string
+    model: string
+    manufacturer: string
+    costInCredits: string
+    length: string
+    crew: string
+    passengers: string
+    cargoCapacity: string
+}
 
 
 
