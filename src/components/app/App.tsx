@@ -6,7 +6,7 @@ import "./App.css"
 
 export const App = () => {
     return (
-        <div  className="stardb-app">
+        <div className="stardb-app">
             <Header/>
             <RandomPlanet/>
             <div className="row mb2">
