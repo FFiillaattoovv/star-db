@@ -2,6 +2,7 @@ import "./RandomPlanet.css"
 import {Component, FC} from "react";
 import {SwapiService, TransformPlanetType} from "../../services/swapiService";
 import {Spinner} from "../spinner/Spinner";
+import {ErrorIndicator} from "../error-indicator/ErrorIndicator";
 
 export class RandomPlanet extends Component<{}, RandomPlanetStateType> {
 
@@ -18,31 +19,42 @@ export class RandomPlanet extends Component<{}, RandomPlanetStateType> {
         population: null,
         rotationPeriod: null,
         diameter: null,
-        loading: true
+        loading: true,
+        error: false,
     }
 
     onPlanetLoaded = (planet: TransformPlanetType) => {
-        this.setState({...planet, loading: false})
+        this.setState({...planet, loading: false, error: false})
+    }
+
+    onError = () => {
+        this.setState({error: true, loading: false})
     }
 
     updatePlanet() {
-        const id = String(Math.floor(Math.random() * 25) + 2)
+        const id = '120000'
 
         this.swapiService.getPlanet(id)
             .then(this.onPlanetLoaded)
+            .catch(this.onError)
     }
 
     render() {
 
-        const {id, name, population, rotationPeriod, diameter, loading} = this.state
+        const {id, name, population, rotationPeriod, diameter, loading, error} = this.state
 
         const spinner = loading ? <Spinner/> : null
-        const content = !loading ? <PlanetView id={id} name={name} population={population} rotationPeriod={rotationPeriod}
+        const errorMessage = error ? <ErrorIndicator/> : null
+        const hasData = !(loading || error)
+
+        const content = hasData ?
+            <PlanetView id={id} name={name} population={population} rotationPeriod={rotationPeriod}
                         diameter={diameter}/> : null
 
         return (
             <div className="random-planet jumbotron rounded">
                 {spinner}
+                {errorMessage}
                 {content}
             </div>
         )
@@ -83,6 +95,7 @@ type RandomPlanetStateType = {
     rotationPeriod: null | string
     diameter: null | string
     loading: boolean
+    error: boolean
 }
 type PlanetViewPropsType = {
     id: null | string
