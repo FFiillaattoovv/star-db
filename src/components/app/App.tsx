@@ -1,15 +1,19 @@
 import {Header} from "../header/Header";
-import {ItemList} from "../item-list/ItemList";
 import {RandomPlanet} from "../random-planet/RandomPlanet";
-import {PersonDetails} from "../pearson-details/PersonDetails";
-import {Component} from "react";
+import {Component, ErrorInfo} from "react";
 import "./App.css"
+import {ErrorIndicator} from "../error-indicator/ErrorIndicator";
+import {PeoplePage} from "../people-page/PeoplePage";
 
 export class App extends Component<{}, AppStateType> {
 
     state = {
         showRandomPlanet: true,
-        selectedPerson: null
+        hasError: false
+    }
+
+    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+        this.setState({hasError: true})
     }
 
     toggleRandomPlanet = () => {
@@ -20,15 +24,11 @@ export class App extends Component<{}, AppStateType> {
         })
     }
 
-    onItemSelected = (id: string) => {
-        this.setState({
-            selectedPerson: id
-        })
-    }
-
     render() {
 
-        const {selectedPerson} = this.state
+        if (this.state.hasError) {
+            return <ErrorIndicator/>
+        }
 
         const planet = this.state.showRandomPlanet ? <RandomPlanet/> : null
 
@@ -41,14 +41,7 @@ export class App extends Component<{}, AppStateType> {
                         Toggle Random Planet
                     </button>
                 </div>
-                <div className="row mb2">
-                    <div className="col-md-6">
-                        <ItemList onItemSelected={this.onItemSelected}/>
-                    </div>
-                    <div className="col-md-6">
-                        <PersonDetails personId={selectedPerson}/>
-                    </div>
-                </div>
+                <PeoplePage/>
             </div>
         )
     }
@@ -57,5 +50,5 @@ export class App extends Component<{}, AppStateType> {
 // types
 type AppStateType = {
     showRandomPlanet: boolean
-    selectedPerson: null | string
+    hasError: boolean
 }
