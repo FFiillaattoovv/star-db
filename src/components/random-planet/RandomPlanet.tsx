@@ -6,11 +6,6 @@ import {ErrorIndicator} from "../error-indicator/ErrorIndicator";
 
 export class RandomPlanet extends Component<{}, RandomPlanetStateType> {
 
-    constructor() {
-        super({});
-        this.updatePlanet()
-    }
-
     swapiService = new SwapiService()
 
     state = {
@@ -23,6 +18,19 @@ export class RandomPlanet extends Component<{}, RandomPlanetStateType> {
         error: false,
     }
 
+    private interval: NodeJS.Timeout | undefined;
+
+    componentDidMount() {
+        this.updatePlanet()
+        this.interval = setInterval(this.updatePlanet, 5000)
+    }
+
+    componentWillUnmount() {
+        if (this.interval) {
+            clearInterval(this.interval)
+        }
+    }
+
     onPlanetLoaded = (planet: TransformPlanetType) => {
         this.setState({...planet, loading: false, error: false})
     }
@@ -31,8 +39,8 @@ export class RandomPlanet extends Component<{}, RandomPlanetStateType> {
         this.setState({error: true, loading: false})
     }
 
-    updatePlanet() {
-        const id = '120000'
+    updatePlanet = () => {
+        const id = String(Math.floor(Math.random() * 25) + 3)
 
         this.swapiService.getPlanet(id)
             .then(this.onPlanetLoaded)
