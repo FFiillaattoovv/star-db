@@ -11,14 +11,15 @@ export class SwapiService {
     }
 
 
-    async getAllPeople(): Promise<Array<PersonType>> {
-        const res: GetAllPeopleResponseType = await this.getResource(`/people/`)
-        return res.results
+    async getAllPeople(): Promise<Array<TransformPersonType>> {
+        let people: GetAllPeopleResponseType
+        people = await this.getResource(`/people/`)
+        return people.results.map(this._transformPerson).slice(0, 5)
     }
 
     async getPerson(id: string): Promise<TransformPersonType> {
-        let pearson: GetPersonResponseType;
-        pearson = await this.getResource(`/people/${id}/`);
+        let pearson: GetPersonResponseType
+        pearson = await this.getResource(`/people/${id}/`)
         return this._transformPerson(pearson)
     }
 
@@ -49,7 +50,7 @@ export class SwapiService {
         return item.match(idRegExp)![1]
     }
 
-    _transformPerson(pearson: PersonType): TransformPersonType {
+    _transformPerson = (pearson: PersonType): TransformPersonType => {
         return {
             id: this._extractId(pearson.url),
             name: pearson.name,
@@ -59,7 +60,7 @@ export class SwapiService {
         }
     }
 
-    _transformPlanet(planet: PlanetType): TransformPlanetType {
+    _transformPlanet = (planet: PlanetType): TransformPlanetType => {
         return {
             id: this._extractId(planet.url),
             name: planet.name,
@@ -69,7 +70,7 @@ export class SwapiService {
         }
     }
 
-    _transformStarship(starship: StarshipType): TransformStarshipType {
+    _transformStarship = (starship: StarshipType): TransformStarshipType => {
         return {
             id: this._extractId(starship.url),
             name: starship.name,
@@ -86,7 +87,7 @@ export class SwapiService {
 }
 
 //types
-type PersonType = {
+export type PersonType = {
     birth_year: string
     eye_color: string
     films: Array<string>
@@ -111,7 +112,7 @@ type GetAllPeopleResponseType = {
     results: Array<PersonType>
 }
 type GetPersonResponseType = PersonType
-type TransformPersonType = {
+export type TransformPersonType = {
     id: string
     name: string
     gender: string
